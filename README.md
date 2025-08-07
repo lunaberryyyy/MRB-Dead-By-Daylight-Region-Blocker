@@ -1,6 +1,10 @@
 Dead by Daylight AWS Region Firewall Tool
 =========================================
 
+READ THIS BEFORE USING
+======================
+Blocking us-east-1 / Virginia is known to cause errors with EAC, try to avoid blocking this region!
+
 Obtaining the Script
 --------------------
 Download the latest release here:

@@ -1,51 +1,97 @@
-Dead by Daylight AWS Region Firewall Tool - README
-=================================================
+Dead by Daylight AWS Region Firewall Tool
+=========================================
 
-This tool allows you to control which AWS server regions Dead by Daylight can connect to by adding or removing Windows Firewall outbound rules for the game. All actions must be run as administrator.
-
--------------------------------------------------
-1. First-Time Setup: Run "FirstSetup.bat"
--------------------------------------------------
-Before you begin, run the "FirstSetup.bat" file located in the MRB folder.
-- This will create a shortcut called "DBD Firewall Tool.lnk" in the MRB folder.
-- Always use this shortcut to launch the tool, as it ensures the script runs with administrator privileges.
-
--------------------------------------------------
-2. Initial Step: Run "Update IP Ranges"
--------------------------------------------------
-The first time you launch the tool, select:
-
-  1 - Update IP Ranges
-
-This downloads the latest AWS server IP ranges and saves them in text files (one per region) in the "Region Codes" folder.
-*Important*: You MUST run this step first, and repeat it occasionally (after game updates or every month) to keep server lists accurate.
-
--------------------------------------------------
-3. Menu Functions Explained
--------------------------------------------------
-
-1 - Update IP Ranges
+Obtaining the Script
 --------------------
-Downloads and updates the list of AWS IP addresses by region.  
-**Run this first and repeat as needed to keep server data current.**
+Download the latest release here:
+https://github.com/MaybeMaidehnless/MRB-Dead-By-Daylight-Region-Blocker/releases
 
-2 - Block Server Regions
-------------------------
-Lets you select which AWS server regions to block for Dead by Daylight.  
-- Select a region by its number, confirm, and a new window will add firewall rules for all IPs in that region.
+This script modifies your firewall settings to block specific server regions used by Dead by Daylight. It does *not* interact with the game client directly.
 
-3 - Remove Server Region Blocks (ALL)
--------------------------------------
-Removes all Windows Firewall rules created by this tool for all regions at once.
+Frequently Asked Questions
+--------------------------
 
-4 - Remove Server Region Blocks (SELECTED)
-------------------------------------------
-Lets you pick individual regions to remove rules for only those regions.    
-Each removal is confirmed and performed in a new window, so you can see progress.
+Q: Does the program inject into Dead by Daylight or interact with the client?
+A: No! The script does not interact with the game client at all. It only needs the path to the game executable so it can apply firewall rules.
 
--------------------------------------------------
-TIPS:
--------------------------------------------------
-- You MUST run the tool as administrator or the firewall commands will not work.
-- Always update IP ranges after a Dead by Daylight update or every month.
-- Use the block and remove functions as needed for best matchmaking experience.
+Q: How does the script block regions?
+A: The script fetches AWS IP ranges (used by DBD servers) and sorts them by region. When you choose to block or unblock a region, it creates or removes Windows Firewall rules for the relevant IPs.
+
+Q: Why does it need admin privileges?
+A: Because applying firewall rules requires administrator access.
+
+Q: What platforms are supported?
+A: This script is designed for Windows and supports game installs from Steam, Epic Games, and the Windows Store.
+
+Q: Is the script safe?
+A: Yes, the entire script is custom-written. You can review a VirusTotal scan of the file here:
+https://www.virustotal.com/gui/file/18b32567b661a9155d5b67162932099bd240795e20b61d48ad93fe2a1781331c?nocache=1
+
+That said, always verify any script you download. See the “Safety Precautions” section at the end for tips.
+
+Q: Is this project still maintained?
+A: Yes, but development is slowly shifting toward a more advanced universal AWS Region Blocker with:
+ - AWS IP and region detection
+ - Live ping timing per region
+ - GUI (no more PowerShell or CLI)
+
+
+First-Time Setup
+----------------
+1. Download and extract the files.
+2. Run MRB_launcher.bat with Administrator privileges.
+3. Choose your platform:
+   - 1 for Steam
+   - 2 for Epic Games
+   - 3 for Windows Store
+
+This sets up the environment for your game install.
+
+
+Finding the Game Executable
+---------------------------
+
+Steam:
+Right-click Dead by Daylight > Manage > Browse Local Files
+Navigate to:
+Dead by Daylight\DeadByDaylight\Binaries\Win64\
+Select: DeadByDaylight-Win64-Shipping.exe
+
+Epic Games:
+From your Library, click the three dots on Dead by Daylight > Manage > Folder icon
+Navigate to:
+Dead by Daylight\DeadByDaylight\Binaries\EGS\
+Select: DeadByDaylight-EGS-Shipping.exe
+
+Windows Store:
+Executable is named: DeadByDaylight-WinGDK-Shipping.exe
+(Automatic path detection is still being improved)
+
+
+Getting the IP Ranges
+---------------------
+After setting the executable path:
+
+1. Select "Update IP Ranges" (usually option 1).
+2. This will download all AWS IP ranges and organize them by region.
+
+
+Block Region(s)
+---------------
+1. Select option 2 to block regions.
+2. Use options 8 and 9 to scroll between pages of regions.
+3. Enter the numbers for each region you want to block.
+4. Press 'A' to apply. The script will write firewall rules for all selected regions.
+   - Wait for the confirmation message.
+
+
+Unblock Region(s)
+-----------------
+Option 3: Unblock ALL regions that were previously blocked for your platform.
+Option 4: Selectively unblock individual regions.
+
+
+More Information
+----------------
+I will be updating my Steam Guide more frequently with updated information, feel free to FAVOURITE that guide or use it to leave comments!
+    https://steamcommunity.com/sharedfiles/filedetails/?id=3543686547

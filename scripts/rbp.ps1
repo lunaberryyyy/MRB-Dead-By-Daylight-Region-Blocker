@@ -42,49 +42,43 @@ if (-not (Test-Path $RegionFile)) {
 function Add-BlockRules {
     $ipRanges = Get-Content $RegionFile
     $newRulesCreated = 0
-    $alreadyExists = 0
     $startTime = Get-Date
 
     Write-Host "`nStarting block operation for $RegionCode..." -ForegroundColor Cyan
 
-    # Load expected IP count from iprange_stat.txt
-        $ipStatFile = Join-Path $RegionCodesDir "iprange_stat.txt"
-        $expectedCount = "?"
-        if (Test-Path $ipStatFile) {
-        $statLines = Get-Content $ipStatFile
-        foreach ($line in $statLines) {
-        if ($line -match "^$RegionCode\s*\|\s*(\d+)$") {
-            $expectedCount = [int]$matches[1]
-            break
-        }
-    }
+# Remove old rules for this region
+Get-NetFirewallRule | Where-Object { $_.DisplayName -like "$RuleNamePrefix - $RegionCode*" } | Remove-NetFirewallRule
+
+# Max IPs per firewall rule
+$chunkSize = 10000  
+
+# Sort IP ranges into chunks of 1000
+$chunks = [System.Collections.Generic.List[Object]]::new()
+for ($i = 0; $i -lt $ipRanges.Count; $i += $chunkSize) {
+    $chunks.Add($ipRanges[$i..([Math]::Min($i + $chunkSize - 1, $ipRanges.Count - 1))])
 }
 
-        $ruleName = "$RuleNamePrefix - $RegionCode"
-        if (-not (Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue)) {
-            Write-Host "Blocking $ip..." -ForegroundColor Yellow
-            New-NetFirewallRule -DisplayName $ruleName -Direction Outbound -Action Block `
-                -Program $GameExePath -RemoteAddress $ipRanges -Profile Any -Enabled True `
-                -Description "Blocks Dead by Daylight from region $RegionCode" | Out-Null
-            $newRulesCreated++
-        } else {
-            Write-Host "Already exists: $ip" -ForegroundColor DarkGray
-            $alreadyExists++
-        }
+# make rules for each chunk
+$ruleIndex = 1
+foreach ($chunk in $chunks) {
+    $ruleName = "$RuleNamePrefix - $RegionCode - $ruleIndex"
+        Write-Host "Blocking region $RegionCode ($ruleIndex)..." -ForegroundColor Yellow
+        New-NetFirewallRule -DisplayName $ruleName -Direction Outbound -Action Block `
+            -Program $GameExePath -RemoteAddress $chunk -Profile Any -Enabled True `
+            -Description "Blocks Dead by Daylight from region $RegionCode ($ruleIndex)" | Out-Null
+        $newRulesCreated++
+    $ruleIndex++
+}
 
     $totalIPs = $ipRanges.Count
-    $actualTotal = if ($expectedCount -ne "?") { $expectedCount } else { $totalIPs }
-    $missed = $actualTotal - ($newRulesCreated + $alreadyExists)
     $elapsed = (Get-Date) - $startTime
 
         Write-Host ""
         Write-Host ""
         Write-Host "===== Blocking Summary =====" -ForegroundColor Green
         Write-Host "Region: $RegionCode"
-        Write-Host "Blocked IPs: $newRulesCreated"
-        Write-Host "Already Blocked: $alreadyExists"
-        Write-Host "Expected IPs from Log: $actualTotal"
-        Write-Host "Missed IPs: $missed"
+        Write-Host "Regions Blocked: $newRulesCreated"
+        Write-Host "Total IPs in List: $totalIPs"
         Write-Host "Elapsed Time: $($elapsed.ToString('hh\:mm\:ss'))"
         Write-Host "============================"
 

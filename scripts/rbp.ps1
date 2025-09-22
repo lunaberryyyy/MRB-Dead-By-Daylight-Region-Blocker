@@ -60,7 +60,7 @@ function Add-BlockRules {
     }
 }
 
-        $ruleName = "$RuleNamePrefix - $RegionCode - $ip"
+        $ruleName = "$RuleNamePrefix - $RegionCode"
         if (-not (Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue)) {
             Write-Host "Blocking $ip..." -ForegroundColor Yellow
             New-NetFirewallRule -DisplayName $ruleName -Direction Outbound -Action Block `
